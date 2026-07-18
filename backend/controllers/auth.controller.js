@@ -1,5 +1,15 @@
 import bcrypt from "bcrypt"
 import { User } from "../models/user.model.js";
+import dotenv from "dotenv";
+import { createAccessToken, createRefreshToken } from "../utils/token.util.js";
+
+dotenv.config()
+const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env;
+const cookieOptions = {
+    httpOnly: true,
+    sameSite: "strict",
+    path: '/'
+}
 
 //user registration 
 export const userRegister = async (req, res, next) => {
@@ -25,8 +35,22 @@ export const userRegister = async (req, res, next) => {
         });
         await user.save();
 
+        //create tokens
+        const paylod = { id: user._id };
+        const accessToken = createAccessToken(paylod, ACCESS_TOKEN_SECRET, '15m');
+        const refreshToken = createRefreshToken(paylod, REFRESH_TOKEN_SECRET, '7d');
+
+        //save refresh token
+        user.refreshToken.push(refreshToken);
+        await user.save();
+
+        //send refresh token as cookies
+        res.cookie('refreshToken', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+
         res.status(201).json({
-            message: "registered successfully"
+            message: "registered successfully",
+            accessToken,
+            refreshToken
         });
 
     } catch (error) {
@@ -66,8 +90,22 @@ export const userLogin = async (req, res, next) => {
             });
         }
 
+        //create tokens
+        const paylod = { id: existingUser._id };
+        const accessToken = createAccessToken(paylod, ACCESS_TOKEN_SECRET, '15m');
+        const refreshToken = createRefreshToken(paylod, REFRESH_TOKEN_SECRET, '7d');
+
+        //save refresh token
+        existingUser.refreshToken.push(refreshToken);
+        await existingUser.save();
+
+        //send refresh token as cookies
+        res.cookie('refreshToken', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+
         res.status(200).json({
-            message: "Login successfully"
+            message: "Login successfully",
+            accessToken,
+            refreshToken
         });
 
     } catch (error) {
