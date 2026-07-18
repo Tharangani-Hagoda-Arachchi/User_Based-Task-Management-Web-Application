@@ -36,3 +36,44 @@ export const userRegister = async (req, res, next) => {
 
     }
 };
+
+//user login
+export const userLogin = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+
+        //chechk email or password empty
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and Password are required"
+            });
+
+        }
+
+        //check user exiist or not
+        const existingUser = await User.findOne({ email });
+        if (!existingUser) {
+            return res.status(401).json({
+                message: "Invalid credentials"
+            });
+        }
+
+        //match password
+        const isMatchPassword = await bcrypt.compare(password, existingUser.password);
+        if (!isMatchPassword) {
+            return res.status(401).json({
+                message: "Invalid credentials"
+            });
+        }
+
+        res.status(200).json({
+            message: "Login successfully"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+};
