@@ -93,7 +93,7 @@ const Signup = ({ isOpen, onClose, openLogin }) => {
     //open login after sucessfull signup
     useEffect(() => {
         if (message) {
-            toast.success(message);
+            toast.success(message, { toastId: "reg-success" });
             dispatch(clearMessages());
             setTimeout(() => {
                 onClose();
@@ -101,10 +101,10 @@ const Signup = ({ isOpen, onClose, openLogin }) => {
             }, 2000)
         }
         if (error) {
-            toast.error(error);
+            toast.error(error, { toastId: "reg-error" });
             dispatch(clearMessages());
         }
-    }, [message,error,dispatch]);
+    }, [message, error, dispatch]);
 
 
 

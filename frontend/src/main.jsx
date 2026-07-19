@@ -8,12 +8,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
     <Provider store={store}>
       <App />
 
       {/*Toast Container*/}
       <ToastContainer position='top-right' hideProgressBar={false} newestOnTop={true} closeOnClick pauseOnHover theme='colored' />
     </Provider>
-  </StrictMode>,
 )

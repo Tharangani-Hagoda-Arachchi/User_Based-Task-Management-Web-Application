@@ -1,6 +1,77 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+
+import { useDispatch, useSelector } from "react-redux";
+import { userLogin, clearMessages } from '../features/auth/authSlice.js';
+
+import { toast } from 'react-toastify';
 
 const Login = ({ isOpen, onClose, openSignup }) => {
+
+    const dispatch = useDispatch();
+
+    //redux state
+    const { loading, message, error } = useSelector(state => state.auth);
+
+    //form state
+    const [formData, setFormData] = React.useState({
+        email: "",
+        password: "",
+    });
+
+    //validaton error state
+    const [errors, setErrors] = React.useState({})
+
+    //input change handler
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    //form validation
+    const validateForm = () => {
+        let validationErrors = {};
+
+        //email validation
+        if (!formData.email.trim()) {
+            validationErrors.email = "Email is required"
+        }
+
+        //password validation
+        if (!formData.password) {
+            validationErrors.password = "Password is required"
+        }
+
+        setErrors(validationErrors);
+
+        return Object.keys(validationErrors).length === 0;
+
+    };
+
+    //login form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (validateForm()) {
+            dispatch(
+                userLogin({
+                    email: formData.email,
+                    password: formData.password,
+                })
+            );
+
+        }
+    };
+
+    //open dashboard sucessfull login
+    useEffect(() => {
+        if (message) {
+            toast.success(message, { toastId: "auth-success" });
+            dispatch(clearMessages());
+        }
+        if (error) {
+            toast.error(error, { toastId: "auth-error" });
+            dispatch(clearMessages());
+        }
+    }, [message, error, dispatch]);
 
     if (!isOpen) return null;
 
@@ -14,23 +85,37 @@ const Login = ({ isOpen, onClose, openSignup }) => {
                     Login your account to organize and manage your daily tasks efficiently.
                 </p>
 
-                <form className='space-y-4'>
+                <form className='space-y-4' onSubmit={handleSubmit}>
 
                     <input
                         type='email'
+                        name='email'
+                        value={formData.email}
+                        onChange={handleChange}
                         required
                         placeholder='Email'
                         className='w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500'
                     />
+                    {
+                        errors.email &&
+                        <p className='text-red-500 text-sm'>{errors.email}</p>
+                    }
 
                     <input
                         type='password'
+                        name='password'
+                        value={formData.password}
+                        onChange={handleChange}
                         required
                         placeholder='Password'
                         className='w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500'
                     />
+                    {
+                        errors.password &&
+                        <p className='text-red-500 text-sm'>{errors.password}</p>
+                    }
 
-                    <button className='w-full bg-purple-600 hover:bg-purple-900 text-white py-3 rounded-lg font-semibold transition'> Login </button>
+                    <button type='submit' className='w-full bg-purple-600 hover:bg-purple-900 text-white py-3 rounded-lg font-semibold transition'> Login </button>
 
                     <p className='text-center text-gray-600 mt-6'> Create new account
                         <button type='button' onClick={() => {
