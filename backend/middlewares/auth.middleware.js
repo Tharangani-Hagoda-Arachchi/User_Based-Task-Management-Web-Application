@@ -22,7 +22,7 @@ export const protect = async (req, res, next) => {
         //verify token
         const decoded = verifyToken(token, process.env.ACCESS_TOKEN_SECRET);
 
-        const user = await User.findById(decoded.id).select("-password");
+        const user = await User.findById(decoded.id).select("-password -refreshToken");
         if (!user) {
             return res.status(401).json({
                 message: "Access Denied, You are not login"
