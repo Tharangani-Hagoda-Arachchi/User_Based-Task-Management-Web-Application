@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../features/auth/authSlice.js";
 import { useNavigate } from "react-router-dom";
+import TaskList from "../components/TaskList.jsx";
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -53,8 +54,9 @@ const Dashboard = () => {
                         </button>
                     </div>
 
-
                 </div>
+                
+                <TaskList/>
             </div>
 
         </div>
