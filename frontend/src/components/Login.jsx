@@ -4,10 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { userLogin, clearMessages } from '../features/auth/authSlice.js';
 
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Login = ({ isOpen, onClose, openSignup }) => {
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     //redux state
     const { loading, message, error } = useSelector(state => state.auth);
@@ -66,6 +68,7 @@ const Login = ({ isOpen, onClose, openSignup }) => {
         if (message) {
             toast.success(message, { toastId: "auth-success" });
             dispatch(clearMessages());
+            navigate("/dashboard")
         }
         if (error) {
             toast.error(error, { toastId: "auth-error" });

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { signupAPI, loginAPI } from "./authAPI.js";
+import { signupAPI, loginAPI, getUserAPI } from "./authAPI.js";
 
 //api call for signup
 export const userSignup = createAsyncThunk(
@@ -27,9 +27,23 @@ export const userLogin = createAsyncThunk(
     }
 );
 
+//api call for user profile
+export const getUser = createAsyncThunk(
+    "auth/me",
+    async (_, { rejectWithValue }) => {
+        try {
+            const data = await getUserAPI();
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Login Failed");
+        }
+    }
+);
+
 //intial state
 const initialState = {
-    accessToken: null,
+    accessToken: localStorage.getItem("accessToken") || null,
+    user: null,
     loading: false,
     message: null,
     error: null
@@ -94,6 +108,22 @@ const authSlice = createSlice({
                     state.error = action.payload;
                 }
             )
+
+            .addCase(
+                getUser.fulfilled, (state, action) => {
+                    state.loading = false;
+                    state.user = action.payload.user;
+                }
+            )
+
+            .addCase(
+                getUser.rejected, (state, action) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                }
+            )
+
+
 
     },
 

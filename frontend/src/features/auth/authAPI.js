@@ -11,3 +11,9 @@ export const loginAPI = async (userData) => {
     const response = await API.post("/auth/login", userData);
     return response.data
 }
+
+//get user api
+export const getUserAPI = async (userData) => {
+    const response = await API.get("/auth/me", userData);
+    return response.data
+}
