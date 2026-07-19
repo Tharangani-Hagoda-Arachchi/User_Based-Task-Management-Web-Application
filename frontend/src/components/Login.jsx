@@ -33,13 +33,13 @@ const Login = ({ isOpen, onClose, openSignup }) => {
                     <button className='w-full bg-purple-600 hover:bg-purple-900 text-white py-3 rounded-lg font-semibold transition'> Login </button>
 
                     <p className='text-center text-gray-600 mt-6'> Create new account
-                        <buuton type='button' onClick={() => {
+                        <button type='button' onClick={() => {
                             onClose();
                             openSignup();
                         }}
                             className='ml-2 text-purple-600 font-semibold hover:underline'>
                             Sign up
-                        </buuton>
+                        </button>
                     </p>
 
                 </form>
