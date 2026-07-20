@@ -35,22 +35,8 @@ export const userRegister = async (req, res, next) => {
         });
         await user.save();
 
-        //create tokens
-        const paylod = { id: user._id };
-        const accessToken = createAccessToken(paylod, ACCESS_TOKEN_SECRET, '15m');
-        const refreshToken = createRefreshToken(paylod, REFRESH_TOKEN_SECRET, '7d');
-
-        //save refresh token
-        user.refreshToken.push(refreshToken);
-        await user.save();
-
-        //send refresh token as cookies
-        res.cookie('refreshToken', refreshToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
-
         res.status(201).json({
             message: "registered successfully",
-            accessToken,
-            refreshToken
         });
 
     } catch (error) {
@@ -105,7 +91,6 @@ export const userLogin = async (req, res, next) => {
         res.status(200).json({
             message: "Login successfully",
             accessToken,
-            refreshToken
         });
 
     } catch (error) {
@@ -137,5 +122,41 @@ export const getUserProfile = async (req, res, next) => {
             message: error.message
         });
 
+    }
+};
+
+//user logout
+export const userLogout = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        // Remove all refresh tokens (logout from all devices)
+        user.refreshToken = [];
+
+        await user.save();
+
+        // Clear refresh token cookie if it exists
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            sameSite: "strict",
+            path: "/",
+        });
+
+        return res.status(200).json({
+            message: "Logout successful"
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message
+        });
     }
 };
