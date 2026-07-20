@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { addTaskAPI, gettaskAPI } from "./taskAPI.js";
+import { addTaskAPI, deleteTaskAPI, gettaskAPI } from "./taskAPI.js";
 
 //api call for all task
 export const getTasks = createAsyncThunk(
@@ -23,6 +23,19 @@ export const newTask = createAsyncThunk(
             return data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Add Failed");
+        }
+    }
+);
+
+//api call for delete task
+export const deleteTask = createAsyncThunk(
+    "tasks/deleteTask",
+    async (taskId, { rejectWithValue }) => {
+        try {
+            const data = await deleteTaskAPI(taskId);
+            return { ...data, taskId };
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Delete Failed");
         }
     }
 );
@@ -93,6 +106,20 @@ const taskSlice = createSlice({
                     state.error = action.payload;
                 }
             )
+
+            .addCase(deleteTask.fulfilled, (state, action) => {
+                state.loading = false;
+                state.message = action.payload.message;
+
+                state.tasks = state.tasks.filter(
+                    (task) => task._id !== action.payload.taskId
+                );
+            })
+
+            .addCase(deleteTask.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
 
     },
 

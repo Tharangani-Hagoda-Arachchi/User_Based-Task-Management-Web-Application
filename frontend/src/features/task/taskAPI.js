@@ -1,6 +1,6 @@
 import { API } from "../../api/axios.js";
 
-//get user api
+//get task api
 export const gettaskAPI = async (taskData) => {
     const response = await API.get("/tasks", taskData);
     return response.data
@@ -9,5 +9,11 @@ export const gettaskAPI = async (taskData) => {
 //add task api
 export const addTaskAPI = async (taskData) => {
     const response = await API.post("/tasks", taskData);
+    return response.data
+}
+
+//delete task api
+export const deleteTaskAPI = async (taskId) => {
+    const response = await API.delete(`/tasks/${taskId}`);
     return response.data
 }

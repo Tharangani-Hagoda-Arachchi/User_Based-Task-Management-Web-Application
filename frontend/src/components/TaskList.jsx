@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getTasks } from "../features/task/taskSlice.js";
+import { getTasks, deleteTask } from "../features/task/taskSlice.js";
 import AddTask from "./AddTask.jsx";
 
 const TaskList = () => {
@@ -40,6 +40,19 @@ const TaskList = () => {
         setFilter(value);
         setCurrentPage(1);
     }
+
+    //delete handler
+    const handleDelete = (taskId) => {
+
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this task?"
+        );
+
+        if (confirmDelete) {
+            dispatch(deleteTask(taskId));
+        }
+
+    };
 
     return (
         <div className="bg-white rounded-xl shadow-md p-5 mt-6">
