@@ -109,3 +109,52 @@ export const deleteTask = async (req, res, next) => {
     }
 };
 
+//update tast status
+export const updateTaskStatus = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!["pending", "completed"].includes(status)) {
+            return res.status(400).json({
+                message: "Invalid status"
+            });
+        }
+
+        //check validation of object id
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid task ID"
+            });
+        }
+
+        //find task by id 
+        const task = await Task.findById(id);
+        if (!task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        //check ownership
+        if (task.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                message: "You are not authorized to delete this task"
+            });
+        }
+
+        //update status
+        task.status = status;
+        await task.save();
+
+        res.status(200).json({
+            message: "Task status updated successfully"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+};

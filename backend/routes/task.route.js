@@ -2,7 +2,7 @@ import express from "express";
 import { validate } from "../middlewares/validate.middleware.js";
 import { addTaskValidateSchema } from "../validators/task.validator.js";
 import { protect } from "../middlewares/auth.middleware.js";
-import { addTask, deleteTask, getAllTask } from "../controllers/task.controller.js";
+import { addTask, deleteTask, getAllTask, updateTaskStatus } from "../controllers/task.controller.js";
 
 export const taskRoute = express.Router();
 
@@ -14,3 +14,6 @@ taskRoute.get('/tasks',protect, getAllTask);
 
 //delete  task
 taskRoute.delete('/tasks/:id',protect, deleteTask);
+
+//update  task status
+taskRoute.patch('/tasks/:id/status',protect, updateTaskStatus);
