@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { getTasks } from "../features/task/taskSlice.js";
+import AddTask from "./AddTask.jsx";
 
 const TaskList = () => {
     const dispatch = useDispatch();
+
+    const [isOpen, setIsOpen] = useState(false);
 
     const { tasks, loading } = useSelector(
         (state) => state.task
@@ -43,7 +46,7 @@ const TaskList = () => {
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5 gap-3">
                 <h2 className="text-2xl font-bold text-gray-800"> My Tasks</h2>
-                <button className="bg-purple-900 text-white px-5 py-2 rounded-lg hover:bg-purple-800 transition">
+                <button onClick={() => setIsOpen(true)} className="bg-purple-900 text-white px-5 py-2 rounded-lg hover:bg-purple-800 transition">
                     + New Task
                 </button>
             </div>
@@ -173,6 +176,7 @@ const TaskList = () => {
                 </div>
             )}
 
+            <AddTask isOpen={isOpen} onClose={() => setIsOpen(false)} />
 
         </div>
 
