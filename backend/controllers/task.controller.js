@@ -19,6 +19,7 @@ export const addTask = async (req, res, next) => {
 
         res.status(201).json({
             message: "Task created successfully",
+            task
 
         });
 
