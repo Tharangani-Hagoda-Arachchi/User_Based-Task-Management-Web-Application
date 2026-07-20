@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { addTaskAPI, deleteTaskAPI, getSingletaskAPI, gettaskAPI, updateStatusTaskAPI } from "./taskAPI.js";
+import { addTaskAPI, deleteTaskAPI, getSingletaskAPI, gettaskAPI, updateStatusTaskAPI, updateTaskAPI } from "./taskAPI.js";
 
 //api call for all task
 export const getTasks = createAsyncThunk(
@@ -65,6 +65,21 @@ export const updaeteStatusOfTask = createAsyncThunk(
         }
     }
 );
+
+//api call for update task 
+export const updaeteOfTask = createAsyncThunk(
+    "tasks/updateTask",
+    async ({ taskId, taskData }, { rejectWithValue }) => {
+        try {
+            const data = await updateTaskAPI(taskId, taskData);
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Task Updation Failed");
+        }
+    }
+);
+
+
 
 //intial state
 const initialState = {
@@ -185,6 +200,21 @@ const taskSlice = createSlice({
             .addCase(getTasksById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+
+            .addCase(updaeteOfTask.fulfilled, (state, action) => {
+                state.loading = false;
+                state.message = action.payload.message;
+                const updatedTask = action.payload.task
+
+                const index = state.tasks.findIndex(
+                    task => task._id === updatedTask._id
+                );
+
+                if (index !== -1) {
+                    state.tasks[index] = updatedTask;
+                }
+
             })
 
 

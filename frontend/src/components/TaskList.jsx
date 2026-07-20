@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTasks, deleteTask, updaeteStatusOfTask, getTasksById } from "../features/task/taskSlice.js";
 import AddTask from "./AddTask.jsx";
 import { TaskDetail } from "./TaskDetail.jsx";
+import UpdateTask from "./UpdateTask.jsx";
 
 const TaskList = () => {
     const dispatch = useDispatch();
@@ -12,6 +13,7 @@ const TaskList = () => {
 
     const [showDetails, setShowDetails] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
+    const [editTask, setEditTask] = useState(null);
 
     const { tasks, loading } = useSelector(
         (state) => state.task
@@ -174,7 +176,7 @@ const TaskList = () => {
                                             View More
                                         </button>
                                         <button
-                                            onClick={() => handleEdit(task)}
+                                            onClick={() => setEditTask(task)}
                                             className="text-blue-600 hover:text-blue-800"
                                         >
                                             <FaEdit size={18} />
@@ -234,7 +236,16 @@ const TaskList = () => {
             )}
 
             <AddTask isOpen={isOpen} onClose={() => setIsOpen(false)} />
-            <TaskDetail isOpen={showDetails} task ={selectedTask} onClose={() => setShowDetails(false)} />
+            <TaskDetail isOpen={showDetails} task={selectedTask} onClose={() => setShowDetails(false)} />
+            {
+                editTask &&
+
+                <UpdateTask
+                    task={editTask}
+                    onClose={() => setEditTask(null)}
+                />
+
+            }
 
         </div>
 
