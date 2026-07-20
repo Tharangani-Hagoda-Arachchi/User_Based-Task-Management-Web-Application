@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getTasks, deleteTask } from "../features/task/taskSlice.js";
+import { getTasks, deleteTask, updaeteStatusOfTask } from "../features/task/taskSlice.js";
 import AddTask from "./AddTask.jsx";
 
 const TaskList = () => {
@@ -51,6 +51,23 @@ const TaskList = () => {
         if (confirmDelete) {
             dispatch(deleteTask(taskId));
         }
+
+    };
+
+    //status change handler
+    const handleStatusChange = (task) => {
+
+        const newStatus =
+            task.status === "pending"
+                ? "completed"
+                : "pending";
+
+        dispatch(
+            updaeteStatusOfTask({
+                taskId: task._id,
+                status: newStatus
+            })
+        );
 
     };
 
@@ -109,9 +126,16 @@ const TaskList = () => {
                                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${task.priority === "high" ? "bg-red-100 text-red-700" : task.priority === "medium" ? "bg-yellow-100 text-yellow-700" : "bg-green-100 text-green-700"}`}>
                                                 {task.priority}
                                             </span>
-                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${task.status === "completed" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"} px-3 py-1 rounded-full text-sm`}>
+                                            <button
+                                                onClick={() => handleStatusChange(task)}
+                                                className={`px-3 py-1 rounded-full text-sm font-medium transition
+                                                    ${task.status === "completed"
+                                                        ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                                        : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                                                    }`}
+                                            >
                                                 {task.status}
-                                            </span>
+                                            </button>
                                             <span className="text-sm text-gray-500">
                                                 Due:{" "}
                                                 {task.dueDate

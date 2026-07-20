@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { addTaskAPI, deleteTaskAPI, gettaskAPI } from "./taskAPI.js";
+import { addTaskAPI, deleteTaskAPI, gettaskAPI, updateStatusTaskAPI } from "./taskAPI.js";
 
 //api call for all task
 export const getTasks = createAsyncThunk(
@@ -36,6 +36,19 @@ export const deleteTask = createAsyncThunk(
             return { ...data, taskId };
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Delete Failed");
+        }
+    }
+);
+
+//api call for update task status
+export const updaeteStatusOfTask = createAsyncThunk(
+    "tasks/updateStatus",
+    async ({ taskId, status }, { rejectWithValue }) => {
+        try {
+            const data = await updateStatusTaskAPI(taskId, status);
+            return  data ;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Status Updation Failed");
         }
     }
 );
@@ -120,6 +133,31 @@ const taskSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            .addCase(updaeteStatusOfTask.pending, (state) => {
+                state.loading = true;
+            })
+
+            .addCase(updaeteStatusOfTask.fulfilled, (state, action) => {
+                state.loading = false;
+                state.message = action.payload.message;
+                const updatedTask = action.payload.task
+
+                const index = state.tasks.findIndex(
+                    task => task._id === updatedTask._id
+                );
+
+                if (index !== -1) {
+                    state.tasks[index] = updatedTask;
+                }
+
+            })
+
+            .addCase(updaeteStatusOfTask.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
 
     },
 
