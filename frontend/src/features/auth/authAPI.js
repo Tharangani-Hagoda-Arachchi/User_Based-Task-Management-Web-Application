@@ -17,3 +17,9 @@ export const getUserAPI = async (userData) => {
     const response = await API.get("/auth/me", userData);
     return response.data
 }
+
+//logout
+export const logoutAPI = async (userData) => {
+    const response = await API.post("/auth/logout", userData);
+    return response.data
+}

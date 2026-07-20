@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "../features/auth/authSlice.js";
+import { getUser, logoutUser } from "../features/auth/authSlice.js";
 import { useNavigate } from "react-router-dom";
 import TaskList from "../components/TaskList.jsx";
 
 const Dashboard = () => {
     const dispatch = useDispatch();
-     const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const { user, loading } = useSelector(
         (state) => state.auth
@@ -16,16 +16,22 @@ const Dashboard = () => {
         dispatch(getUser());
     }, [dispatch])
 
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate("/login");
+    const handleLogout = async () => {
+        const result = await dispatch(logoutUser());
+
+        if (logoutUser.fulfilled.match(result)) {
+            localStorage.removeItem("accessToken");
+            navigate("/");
+        } else {
+            console.error(result.payload);
+        }
     };
 
 
     return (
         <div className='flex flex-col lg:flex-row min-h-screen'>
-            <div className='w-full lg:w-52 bg-purple-900 min-h-20 lg:min-h-screen flex items-center justify-center'>
-                <h1 className='text-white text-xl font-bold'>Dashboard</h1>
+            <div className='w-full lg:w-52 bg-purple-900 min-h-20 lg:min-h-screen flex  '>
+                <h2 className='text-white text-xl font-bold p-5'>Dashboard</h2>
             </div>
             <div className='flex-1 bg-gray-100 min-h-screen p-6' >
                 <div className=" bg-white rounded-xl shadow-md p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4  ">
@@ -55,8 +61,8 @@ const Dashboard = () => {
                     </div>
 
                 </div>
-                
-                <TaskList/>
+
+                <TaskList />
             </div>
 
         </div>
