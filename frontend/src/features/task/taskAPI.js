@@ -6,6 +6,12 @@ export const gettaskAPI = async (taskData) => {
     return response.data
 }
 
+//get single task api
+export const getSingletaskAPI = async (taskId) => {
+    const response = await API.get(`/tasks/${taskId}`);
+    return response.data
+}
+
 //add task api
 export const addTaskAPI = async (taskData) => {
     const response = await API.post("/tasks", taskData);

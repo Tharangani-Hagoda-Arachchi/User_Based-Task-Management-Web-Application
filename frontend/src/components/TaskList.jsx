@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getTasks, deleteTask, updaeteStatusOfTask } from "../features/task/taskSlice.js";
+import { getTasks, deleteTask, updaeteStatusOfTask, getTasksById } from "../features/task/taskSlice.js";
 import AddTask from "./AddTask.jsx";
+import { TaskDetail } from "./TaskDetail.jsx";
 
 const TaskList = () => {
     const dispatch = useDispatch();
 
     const [isOpen, setIsOpen] = useState(false);
+
+    const [showDetails, setShowDetails] = useState(false);
+    const [selectedTask, setSelectedTask] = useState(null);
 
     const { tasks, loading } = useSelector(
         (state) => state.task
@@ -70,6 +74,16 @@ const TaskList = () => {
         );
 
     };
+
+    //view single task 
+    const handleViewMore = async (taskId) => {
+        const result = await dispatch(getTasksById(taskId));
+
+        if (result.payload) {
+            setSelectedTask(result.payload.task);
+            setShowDetails(true);
+        }
+    }
 
     return (
         <div className="bg-white rounded-xl shadow-md p-5 mt-6">
@@ -154,6 +168,12 @@ const TaskList = () => {
 
                                     <div className="flex gap-3 mb-5">
                                         <button
+                                            onClick={() => handleViewMore(task._id)}
+                                            className="text-purple-700 font-medium"
+                                        >
+                                            View More
+                                        </button>
+                                        <button
                                             onClick={() => handleEdit(task)}
                                             className="text-blue-600 hover:text-blue-800"
                                         >
@@ -214,6 +234,7 @@ const TaskList = () => {
             )}
 
             <AddTask isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            <TaskDetail isOpen={showDetails} task ={selectedTask} onClose={() => setShowDetails(false)} />
 
         </div>
 

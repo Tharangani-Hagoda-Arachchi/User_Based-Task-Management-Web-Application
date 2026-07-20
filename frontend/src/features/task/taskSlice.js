@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { addTaskAPI, deleteTaskAPI, gettaskAPI, updateStatusTaskAPI } from "./taskAPI.js";
+import { addTaskAPI, deleteTaskAPI, getSingletaskAPI, gettaskAPI, updateStatusTaskAPI } from "./taskAPI.js";
 
 //api call for all task
 export const getTasks = createAsyncThunk(
@@ -7,6 +7,19 @@ export const getTasks = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const data = await gettaskAPI();
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || "Task loading Failed");
+        }
+    }
+);
+
+// api call for get single task
+export const getTasksById = createAsyncThunk(
+    "tasks/getTasksById",
+    async (taskId, { rejectWithValue }) => {
+        try {
+            const data = await getSingletaskAPI(taskId);
             return data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Task loading Failed");
@@ -46,7 +59,7 @@ export const updaeteStatusOfTask = createAsyncThunk(
     async ({ taskId, status }, { rejectWithValue }) => {
         try {
             const data = await updateStatusTaskAPI(taskId, status);
-            return  data ;
+            return data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || "Status Updation Failed");
         }
@@ -154,6 +167,22 @@ const taskSlice = createSlice({
             })
 
             .addCase(updaeteStatusOfTask.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            .addCase(getTasksById.pending, (state) => {
+                state.loading = true;
+            })
+
+            .addCase(getTasksById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.message = action.payload.message;
+                const updatedTask = action.payload.task;
+
+            })
+
+            .addCase(getTasksById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
