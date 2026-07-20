@@ -30,7 +30,7 @@ export const addTask = async (req, res, next) => {
     }
 };
 
-//create new task
+//get all task
 export const getAllTask = async (req, res, next) => {
     try {
         const tasks = await Task.find({
@@ -57,6 +57,47 @@ export const getAllTask = async (req, res, next) => {
             totalTasks: tasks.length,
             tasks
 
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+};
+
+//get task by id
+export const getSingleTask = async (req, res, next) => {
+    try {
+
+        const { id } = req.params;
+
+        //check validation of object id
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "Invalid task ID"
+            });
+        }
+
+        //find task by id 
+        const task = await Task.findById(id);
+        if (!task) {
+            return res.status(404).json({
+                message: "Task not found"
+            });
+        }
+
+        //check ownership
+        if (task.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                message: "You are not authorized to delete this task"
+            });
+        }
+
+        res.status(200).json({
+            message: "Task fetched successfully",
+            task
         });
 
     } catch (error) {
@@ -115,6 +156,8 @@ export const updateTaskStatus = async (req, res, next) => {
         const { id } = req.params;
         const { status } = req.body;
 
+
+
         if (!["pending", "completed"].includes(status)) {
             return res.status(400).json({
                 message: "Invalid status"
@@ -148,7 +191,8 @@ export const updateTaskStatus = async (req, res, next) => {
         await task.save();
 
         res.status(200).json({
-            message: "Task status updated successfully"
+            message: "Task status updated successfully",
+            task
         });
 
     } catch (error) {
